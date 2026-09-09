@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в аккаунт</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 40px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo i {
+            font-size: 50px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 28px;
+        }
+        
+        .logo p {
+            color: #666;
+            margin-top: 5px;
+            font-size: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            cursor: pointer;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .remember {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        .remember label {
+            margin-bottom: 0;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .forgot-password {
+            font-size: 14px;
+        }
+        
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .social-login {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .social-login p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .social-login p::before,
+        .social-login p::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background-color: #eee;
+        }
+        
+        .social-login p::before {
+            left: 0;
+        }
+        
+        .social-login p::after {
+            right: 0;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-3px);
+        }
+        
+        .facebook {
+            background-color: #3b5998;
+        }
+        
+        .google {
+            background-color: #dd4b39;
+        }
+        
+        .twitter {
+            background-color: #1da1f2;
+        }
+        
+        .register-link {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+        }
+        
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .demo-accounts {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .demo-accounts h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .demo-account {
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .remember-forgot {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <i class="fas fa-user-circle"></i>
+            <h1>Вход в аккаунт</h1>
+            <p>Введите ваши данные для входа</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Электронная почта</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="example@mail.com">
+                </div>
+                <div class="error-message" id="emailError">Пожалуйста, введите корректный email</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Введите пароль">
+                    <span class="password-toggle" id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <div class="error-message" id="passwordError">Пожалуйста, введите пароль</div>
+            </div>
+            
+            <div class="remember-forgot">
+                <div class="remember">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Запомнить меня</label>
+                </div>
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink">Забыли пароль?</a>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Войти</button>
+            
+            <div class="social-login">
+                <p>Или войдите через</p>
+                <div class="social-icons">
+                    <div class="social-icon facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <div class="social-icon google">
+                        <i class="fab fa-google"></i>
+                    </div>
+                    <div class="social-icon twitter">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="register-link">
+                Нет аккаунта? <a href="registration.html" id="registerLink">Зарегистрироваться</a>
+            </div>
+        </form>
+        
+        <div class="demo-accounts">
+            <h3>Демо-аккаунты для тестирования:</h3>
+            <div class="demo-account">
+                <span>admin@example.com</span>
+                <span>пароль: admin123</span>
+            </div>
+            <div class="demo-account">
+                <span>user@example.com</span>
+                <span>пароль: user123</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Переключение видимости пароля
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordField = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+            
+            // Валидация формы входа
+            const loginForm = document.getElementById('loginForm');
+            
+            // Демо-аккаунты для тестирования
+            const demoAccounts = [
+                { email: 'admin@example.com', password: 'admin123' },
+                { email: 'user@example.com', password: 'user123' }
+            ];
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Сброс ошибок
+                resetErrors();
+                
+                // Получение значений полей
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const remember = document.getElementById('remember').checked;
+                
+                let isValid = true;
+                
+                // Валидация email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showError('emailError');
+                    isValid = false;
+                }
+                
+                // Валидация пароля
+                if (password.length < 1) {
+                    showError('passwordError');
+                    isValid = false;
+                }
+                
+                // Проверка демо-аккаунтов
+                if (isValid) {
+                    const account = demoAccounts.find(acc => 
+                        acc.email === email && acc.password === password
+                    );
+                    
+                    if (account) {
+                        // Успешный вход
+                        alert(`Успешный вход! Добро пожаловать, ${email}`);
+                        
+                        // Сохраняем в localStorage, если выбрано "Запомнить меня"
+                        if (remember) {
+                            localStorage.setItem('rememberedEmail', email);
+                        } else {
+                            localStorage.removeItem('rememberedEmail');
+                        }
+                        
+                        // Перенаправление на главную страницу (в реальном приложении)
+                        // window.location.href = 'dashboard.html';
+                    } else {
+                        // Неверные учетные данные
+                        alert('Неверный email или пароль. Попробуйте снова или используйте демо-аккаунты.');
+                    }
+                }
+            });
+            
+            // Заполнение email из localStorage, если есть сохраненный
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            if (rememberedEmail) {
+                document.getElementById('email').value = rememberedEmail;
+                document.getElementById('remember').checked = true;
+            }
+            
+            // Ссылка "Забыли пароль"
+            document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value.trim();
+                
+                if (email) {
+                    alert(`На адрес ${email} отправлена ссылка для сброса пароля.`);
+                } else {
+                    alert('Пожалуйста, введите email для восстановления пароля.');
+                    document.getElementById('email').focus();
+                }
+            });
+            
+            // Ссылка на регистрацию
+            document.getElementById('registerLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Переход на страницу регистрации. В реальном приложении здесь будет перенаправление.');
+                // window.location.href = 'register.html';
+            });
+            
+            // Обработка кликов по соц. кнопкам
+            document.querySelectorAll('.social-icon').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const platform = this.classList.contains('facebook') ? 'Facebook' : 
+                                   this.classList.contains('google') ? 'Google' : 'Twitter';
+                    alert(`Вход через ${platform}. В реальном приложении здесь будет OAuth авторизация.`);
+                });
+            });
+            
+            // Автозаполнение демо-аккаунтов при клике
+            document.querySelectorAll('.demo-account').forEach((account, index) => {
+                account.addEventListener('click', function() {
+                    const demoAccount = demoAccounts[index];
+                    document.getElementById('email').value = demoAccount.email;
+                    document.getElementById('password').value = demoAccount.password;
+                    
+                    // Показать пароль на 3 секунды для удобства тестирования
+                    passwordField.setAttribute('type', 'text');
+                    togglePassword.querySelector('i').classList.remove('fa-eye');
+                    togglePassword.querySelector('i').classList.add('fa-eye-slash');
+                    
+                    setTimeout(() => {
+                        passwordField.setAttribute('type', 'password');
+                        togglePassword.querySelector('i').classList.remove('fa-eye-slash');
+                        togglePassword.querySelector('i').classList.add('fa-eye');
+                    }, 3000);
+                });
+            });
+            
+            // Функция показа ошибки
+            function showError(errorId) {
+                document.getElementById(errorId).style.display = 'block';
+            }
+            
+            // Функция сброса ошибок
+            function resetErrors() {
+                const errorElements = document.querySelectorAll('.error-message');
+                errorElements.forEach(element => {
+                    element.style.display = 'none';
+                });
+            }
+            
+            // Валидация в реальном времени
+            const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                input.addEventListener('input', function() {
+                    const errorId = this.id === 'email' ? 'emailError' : 'passwordError';
+                    document.getElementById(errorId).style.display = 'none';
+                });
+            });
+            
+            function validateField(field) {
+                const fieldId = field.id;
+                const value = field.value.trim();
+                
+                if (fieldId === 'email' && value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        showError('emailError');
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
