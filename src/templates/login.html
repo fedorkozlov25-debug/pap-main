@@ -248,27 +248,6 @@
             text-decoration: underline;
         }
         
-        .demo-accounts {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #555;
-        }
-        
-        .demo-accounts h3 {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .demo-account {
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
         @media (max-width: 480px) {
             .login-container {
                 padding: 30px 20px;
@@ -290,12 +269,12 @@
             <p>Введите ваши данные для входа</p>
         </div>
         
-        <form id="loginForm">
+        <form id="loginForm" action="{{ url_for('user_login') }}" method="post">
             <div class="form-group">
                 <label for="email">Электронная почта</label>
                 <div class="input-with-icon">
                     <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" placeholder="example@mail.com">
+                    <input type="email" id="email" name="email" maxlength="255" autocomplete="username" placeholder="example@mail.com" required>
                 </div>
                 <div class="error-message" id="emailError">Пожалуйста, введите корректный email</div>
             </div>
@@ -304,7 +283,7 @@
                 <label for="password">Пароль</label>
                 <div class="input-with-icon">
                     <i class="fas fa-lock"></i>
-                    <input type="password" id="password" placeholder="Введите пароль">
+                    <input type="password" id="password" name="password" maxlength="1024" autocomplete="current-password" placeholder="Введите пароль" required>
                     <span class="password-toggle" id="togglePassword">
                         <i class="fas fa-eye"></i>
                     </span>
@@ -322,6 +301,7 @@
                 </div>
             </div>
             
+            <div class="error-message" id="loginError" role="alert"></div>
             <button type="submit" class="btn">Войти</button>
             
             <div class="social-login">
@@ -340,190 +320,108 @@
             </div>
             
             <div class="register-link">
-                Нет аккаунта? <a href="registration.html" id="registerLink">Зарегистрироваться</a>
+                Нет аккаунта? <a href="{{ url_for('registration') }}" id="registerLink">Зарегистрироваться</a>
             </div>
         </form>
         
-        <div class="demo-accounts">
-            <h3>Демо-аккаунты для тестирования:</h3>
-            <div class="demo-account">
-                <span>admin@example.com</span>
-                <span>пароль: admin123</span>
-            </div>
-            <div class="demo-account">
-                <span>user@example.com</span>
-                <span>пароль: user123</span>
-            </div>
-        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Переключение видимости пароля
             const togglePassword = document.getElementById('togglePassword');
             const passwordField = document.getElementById('password');
-            
+            const emailField = document.getElementById('email');
+            const loginForm = document.getElementById('loginForm');
+            const loginError = document.getElementById('loginError');
+
             togglePassword.addEventListener('click', function() {
-                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordField.setAttribute('type', type);
+                passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
                 this.querySelector('i').classList.toggle('fa-eye');
                 this.querySelector('i').classList.toggle('fa-eye-slash');
             });
-            
-            // Валидация формы входа
-            const loginForm = document.getElementById('loginForm');
-            
-            // Демо-аккаунты для тестирования
-            const demoAccounts = [
-                { email: 'admin@example.com', password: 'admin123' },
-                { email: 'user@example.com', password: 'user123' }
-            ];
-            
-            loginForm.addEventListener('submit', function(e) {
+
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
-                // Сброс ошибок
                 resetErrors();
-                
-                // Получение значений полей
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
+
+                const email = emailField.value.trim();
+                const password = passwordField.value;
                 const remember = document.getElementById('remember').checked;
-                
                 let isValid = true;
-                
-                // Валидация email
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
+
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                     showError('emailError');
                     isValid = false;
                 }
-                
-                // Валидация пароля
                 if (password.length < 1) {
                     showError('passwordError');
                     isValid = false;
                 }
-                
-                // Проверка демо-аккаунтов
-                if (isValid) {
-                    const account = demoAccounts.find(acc => 
-                        acc.email === email && acc.password === password
-                    );
-                    
-                    if (account) {
-                        // Успешный вход
-                        alert(`Успешный вход! Добро пожаловать, ${email}`);
-                        
-                        // Сохраняем в localStorage, если выбрано "Запомнить меня"
-                        if (remember) {
-                            localStorage.setItem('rememberedEmail', email);
-                        } else {
-                            localStorage.removeItem('rememberedEmail');
-                        }
-                        
-                        // Перенаправление на главную страницу (в реальном приложении)
-                        // window.location.href = 'dashboard.html';
-                    } else {
-                        // Неверные учетные данные
-                        alert('Неверный email или пароль. Попробуйте снова или используйте демо-аккаунты.');
+                if (!isValid) {
+                    return;
+                }
+
+                const button = loginForm.querySelector('button[type="submit"]');
+                button.disabled = true;
+                try {
+                    const response = await fetch(loginForm.action, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({email, password})
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        loginError.textContent = data.error || 'Не удалось выполнить вход.';
+                        showError('loginError');
+                        return;
                     }
+
+                    // Запоминаем только email, но не пароль или его хэш.
+                    if (remember) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+                    passwordField.value = '';
+                    alert('Успешный вход!');
+                } catch (error) {
+                    loginError.textContent = 'Не удалось выполнить вход. Попробуйте позже.';
+                    showError('loginError');
+                } finally {
+                    button.disabled = false;
                 }
             });
-            
-            // Заполнение email из localStorage, если есть сохраненный
+
             const rememberedEmail = localStorage.getItem('rememberedEmail');
             if (rememberedEmail) {
-                document.getElementById('email').value = rememberedEmail;
+                emailField.value = rememberedEmail;
                 document.getElementById('remember').checked = true;
             }
-            
-            // Ссылка "Забыли пароль"
+
             document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
                 e.preventDefault();
-                const email = document.getElementById('email').value.trim();
-                
-                if (email) {
-                    alert(`На адрес ${email} отправлена ссылка для сброса пароля.`);
-                } else {
-                    alert('Пожалуйста, введите email для восстановления пароля.');
-                    document.getElementById('email').focus();
-                }
+                alert('Восстановление пароля пока не настроено.');
             });
-            
-            // Ссылка на регистрацию
-            document.getElementById('registerLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Переход на страницу регистрации. В реальном приложении здесь будет перенаправление.');
-                // window.location.href = 'register.html';
-            });
-            
-            // Обработка кликов по соц. кнопкам
+
             document.querySelectorAll('.social-icon').forEach(icon => {
                 icon.addEventListener('click', function() {
-                    const platform = this.classList.contains('facebook') ? 'Facebook' : 
-                                   this.classList.contains('google') ? 'Google' : 'Twitter';
-                    alert(`Вход через ${platform}. В реальном приложении здесь будет OAuth авторизация.`);
+                    alert('Вход через социальные сети пока не настроен.');
                 });
             });
-            
-            // Автозаполнение демо-аккаунтов при клике
-            document.querySelectorAll('.demo-account').forEach((account, index) => {
-                account.addEventListener('click', function() {
-                    const demoAccount = demoAccounts[index];
-                    document.getElementById('email').value = demoAccount.email;
-                    document.getElementById('password').value = demoAccount.password;
-                    
-                    // Показать пароль на 3 секунды для удобства тестирования
-                    passwordField.setAttribute('type', 'text');
-                    togglePassword.querySelector('i').classList.remove('fa-eye');
-                    togglePassword.querySelector('i').classList.add('fa-eye-slash');
-                    
-                    setTimeout(() => {
-                        passwordField.setAttribute('type', 'password');
-                        togglePassword.querySelector('i').classList.remove('fa-eye-slash');
-                        togglePassword.querySelector('i').classList.add('fa-eye');
-                    }, 3000);
-                });
-            });
-            
-            // Функция показа ошибки
+
             function showError(errorId) {
                 document.getElementById(errorId).style.display = 'block';
             }
-            
-            // Функция сброса ошибок
+
             function resetErrors() {
-                const errorElements = document.querySelectorAll('.error-message');
-                errorElements.forEach(element => {
+                document.querySelectorAll('.error-message').forEach(element => {
                     element.style.display = 'none';
                 });
             }
-            
-            // Валидация в реальном времени
-            const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
-            inputs.forEach(input => {
-                input.addEventListener('blur', function() {
-                    validateField(this);
-                });
-                
-                input.addEventListener('input', function() {
-                    const errorId = this.id === 'email' ? 'emailError' : 'passwordError';
-                    document.getElementById(errorId).style.display = 'none';
-                });
+
+            [emailField, passwordField].forEach(input => {
+                input.addEventListener('input', resetErrors);
             });
-            
-            function validateField(field) {
-                const fieldId = field.id;
-                const value = field.value.trim();
-                
-                if (fieldId === 'email' && value) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(value)) {
-                        showError('emailError');
-                    }
-                }
-            }
         });
     </script>
 </body>
